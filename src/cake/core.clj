@@ -8,6 +8,12 @@
     default
     (first sequence)))
 
+(defn survey [environment-name]
+  "Survey an environment, and return its current state")
+
+
 (defn plan [current-state required-state]
   "Works out the steps to go from the current state to the required state"
-  [])
+  (if (empty? current-state)
+             (list (list 'create required-state))
+             (list)))

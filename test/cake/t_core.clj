@@ -32,6 +32,14 @@
 
 (facts "about plans"
        (fact "No plans required if both current-state and required-state are the same"
-             (plan {:name "foo"} {:name "foo"}) => []
-             (plan {:name "foo" :hosts {}} {:name "foo" :hosts {}} )))
+             (plan {:name "foo"} {:name "foo"}) => '()
+             (plan {:name "foo" :hosts {}} {:name "foo" :hosts {}} ) => '())
+
+       (fact "New plan generates an environment"
+             (plan {} {:name "env"}) => '((create {:name "env"}))) )
+             ;(plan {} {:name "env" :hosts {:a {} :b {}}})
+             ;      => '(
+             ;            (create "env")
+             ;            (create "env" :a)
+             ;            (create "env" :b))))
 

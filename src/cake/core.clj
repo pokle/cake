@@ -13,7 +13,12 @@
 
 
 (defn plan [current-state required-state]
+
   "Works out the steps to go from the current state to the required state"
+
+  (assert (required-state :name))
+
   (if (empty? current-state)
-             (list (list 'create required-state))
-             (list)))
+    (list (list 'create required-state))
+    (list)))
+

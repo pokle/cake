@@ -35,11 +35,18 @@
              (plan {:name "foo"} {:name "foo"}) => '()
              (plan {:name "foo" :hosts {}} {:name "foo" :hosts {}} ) => '())
 
+       (fact "Invalid environments"
+             (plan {} {}) => (throws java.lang.AssertionError "Assert failed: (required-state :name)"))
+
        (fact "New plan generates an environment"
-             (plan {} {:name "env"}) => '((create {:name "env"}))) )
-             ;(plan {} {:name "env" :hosts {:a {} :b {}}})
-             ;      => '(
-             ;            (create "env")
-             ;            (create "env" :a)
-             ;            (create "env" :b))))
+
+             ; Environment with no hosts
+             (plan {} {:name "env"}) => '((create {:name "env"}))
+
+             ; Environment with hosts
+             (plan {} {:name "env" :hosts {:a {} :b {}}})
+                   => '(
+                         (create "env")
+                         (create "env" :a)
+                         (create "env" :b))))
 

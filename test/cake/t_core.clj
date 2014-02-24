@@ -35,13 +35,14 @@
 
 
              (fact "New environment with required hosts"
-                   (plan {} {:name "env" :hosts {:hosta {} :hostb {}}})
+                   (plan {} {:name "env" :hosts {:hosta { :image "ami-foo" } :hostb { :image "ami-poo"}}})
                    => '(
                          (create { :name "env" })
-                         (create { :name :hosta })
-                         (create { :name :hostb }))))
+                         (create { :name :hosta :image "ami-foo" })
+                         (create { :name :hostb :image "ami-poo" }))))
+
 
 
        (fact "Compare with existing empty environment"
-             (plan {:name "env"} {:name "enbv"}) => no-change-planned))
+             (plan {:name "env"} {:name "env"}) => no-change-planned))
 

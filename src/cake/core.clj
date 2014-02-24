@@ -33,6 +33,6 @@
     (conj
       (plan-hosts (get current-state :hosts) (get required-state :hosts))
       (list 'create (dissoc required-state :hosts)))
-    (list)))
+    (plan-hosts (get current-state :hosts) (get required-state :hosts))))
 
 

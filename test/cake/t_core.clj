@@ -33,16 +33,25 @@
              (fact "New environment with no required hosts"
                    (plan {} {:name "env"}) => '((create {:name "env"})))
 
-
              (fact "New environment with required hosts"
-                   (plan {} {:name "env" :hosts {:hosta { :image "ami-foo" } :hostb { :image "ami-poo"}}})
-                   => '(
-                         (create { :name "env" })
-                         (create { :name :hosta :image "ami-foo" })
-                         (create { :name :hostb :image "ami-poo" }))))
-
-
+                   (plan {}
+                         {:name :env
+                          :hosts {:hosta { :image "ami-foo" }
+                                  :hostb { :image "ami-poo"}}})
+                   => (fn [plan]
+                        (and (= (first plan) '(create { :name :env}))
+                             (or (= (second plan) '(create { :name :hosta :image "ami-foo" }))
+                                 (= (second plan) '(create { :name :hostb :image "ami-poo" })))
+                             (or (= (nth plan 2)  '(create { :name :hosta :image "ami-foo" }))
+                                 (= (nth plan 2)  '(create { :name :hostb :image "ami-poo" })))
+                             )))) ; Yes, this is insane!
 
        (fact "Compare with existing empty environment"
-             (plan {:name "env"} {:name "env"}) => no-change-planned))
+             (plan {:name "env"} {:name "env"}) => no-change-planned)
+
+
+       (fact "Host image change"
+             (plan {:name "env" :hosts { :host { :image "ami-ver-1" }}}
+                   {:name "env" :hosts { :host { :image "ami-ver-2" }}})
+             => '((create {:name :host :image "ami-ver-2"}))))
 

@@ -2,19 +2,6 @@
   (:use midje.sweet)
   (:use [cake.core]))
 
-(facts "about `first-element`"
-  (fact "it normally returns the first element"
-    (first-element [1 2 3] :default) => 1
-    (first-element '(1 2 3) :default) => 1)
-
-  ;; I'm a little unsure how Clojure types map onto the Lisp I'm used to.
-  (fact "default value is returned for empty sequences"
-    (first-element [] :default) => :default
-    (first-element '() :default) => :default
-    (first-element nil :default) => :default
-    (first-element (filter even? [1 3 5]) :default) => :default))
-
-
 ;; Might want a recursive state definition so that hosts and containers
 ;; look similar
 ;; At the very least, a host has a name, an image, and child hosts
@@ -29,8 +16,11 @@
                       :hosts {
                               :pdf-service-container { :image "pdf-service:1.0" }}}}})
 
+(def no-change-planned '())
+
 
 (facts "about plans"
+
        (fact "No plans required if both current-state and required-state are the same"
              (plan {:name "foo"} {:name "foo"}) => '()
              (plan {:name "foo" :hosts {}} {:name "foo" :hosts {}} ) => '())
@@ -38,15 +28,20 @@
        (fact "Invalid environments"
              (plan {} {}) => (throws java.lang.AssertionError "Assert failed: (required-state :name)"))
 
-       (fact "New plan generates an environment"
+       (fact "New plan"
 
-             ; Environment with no hosts
-             (plan {} {:name "env"}) => '((create {:name "env"}))
+             (fact "New environment with no required hosts"
+                   (plan {} {:name "env"}) => '((create {:name "env"})))
 
-             ; Environment with hosts
-             (plan {} {:name "env" :hosts {:a {} :b {}}})
+
+             (fact "New environment with required hosts"
+                   (plan {} {:name "env" :hosts {:hosta {} :hostb {}}})
                    => '(
-                         (create "env")
-                         (create "env" :a)
-                         (create "env" :b))))
+                         (create { :name "env" })
+                         (create { :name :hosta })
+                         (create { :name :hostb }))))
+
+
+       (fact "Compare with existing empty environment"
+             (plan {:name "env"} {:name "enbv"}) => no-change-planned))
 
